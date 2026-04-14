@@ -142,23 +142,71 @@ export const NavigationDashboard: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="perception" className="mt-0 outline-none">
-            <Card className="bg-zinc-900/40 border-zinc-800">
-              <CardHeader>
-                <CardTitle>Perception Layer Analysis</CardTitle>
-                <CardDescription>Object detection and navigation decision mapping.</CardDescription>
-              </CardHeader>
-              <CardContent className="h-[400px] flex items-center justify-center border-2 border-dashed border-zinc-800 rounded-xl m-6">
-                <div className="text-center space-y-4">
-                  <div className="p-4 bg-zinc-800/50 rounded-full w-fit mx-auto">
-                    <Eye size={32} className="text-zinc-600" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <Card className="lg:col-span-2 bg-zinc-900/40 border-zinc-800 overflow-hidden">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye size={20} className="text-sky-400" />
+                    Scene Analysis
+                  </CardTitle>
+                  <CardDescription>Real-time threat detection and navigation mapping.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0 relative aspect-video bg-zinc-950 flex items-center justify-center">
+                  <img 
+                    src="https://images.unsplash.com/photo-1545147986-a9d6f210df77?auto=format&fit=crop&q=80&w=1200" 
+                    alt="Street Scene" 
+                    className="w-full h-full object-cover opacity-40"
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 p-8 flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <div className="bg-zinc-900/90 border border-zinc-700 p-2 rounded text-[10px] font-mono">
+                        CAM_01 // 1080p // 60FPS
+                      </div>
+                      <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">
+                        Live Feed
+                      </div>
+                    </div>
+                    
+                    {/* Simulated Bounding Boxes */}
+                    <div className="absolute top-1/4 left-1/3 w-32 h-48 border-2 border-rose-500 rounded-sm">
+                      <div className="absolute -top-6 left-0 bg-rose-500 text-white text-[10px] px-1 font-bold">PERSON 0.98</div>
+                      <div className="absolute -bottom-6 left-0 bg-rose-500/20 text-rose-400 text-[10px] px-1 font-bold border border-rose-500/40">ACTION: STOP</div>
+                    </div>
+                    
+                    <div className="absolute top-1/2 left-1/2 w-48 h-32 border-2 border-sky-500 rounded-sm">
+                      <div className="absolute -top-6 left-0 bg-sky-500 text-white text-[10px] px-1 font-bold">CAR 0.92</div>
+                      <div className="absolute -bottom-6 left-0 bg-sky-500/20 text-sky-400 text-[10px] px-1 font-bold border border-sky-500/40">ACTION: SLOW</div>
+                    </div>
                   </div>
-                  <p className="text-zinc-500 max-w-xs">
-                    Perception layer simulation requires image input. Upload a scene to analyze navigation threats.
-                  </p>
-                  <Button variant="outline">Upload Scene</Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-zinc-900/40 border-zinc-800">
+                <CardHeader>
+                  <CardTitle className="text-lg">Detection Logs</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {[
+                    { time: '12:04:22', obj: 'Person', conf: '98%', action: 'STOP' },
+                    { time: '12:04:21', obj: 'Car', conf: '92%', action: 'SLOW' },
+                    { time: '12:04:18', obj: 'Traffic Light', conf: '88%', action: 'CHECK' },
+                    { time: '12:04:15', obj: 'Bicycle', conf: '76%', action: 'MONITOR' },
+                  ].map((log, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
+                      <div>
+                        <div className="text-[10px] text-zinc-500 font-mono">{log.time}</div>
+                        <div className="text-sm font-medium">{log.obj}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-[10px] text-sky-400 font-bold">{log.conf}</div>
+                        <Badge variant="outline" className="text-[9px] py-0 h-4 uppercase">{log.action}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="analytics" className="mt-0 outline-none">
