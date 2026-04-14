@@ -1,0 +1,6 @@
+{
+  "name": "AeroNav AI - Autonomous Navigation System",
+  "description": "An AI-powered autonomous navigation system featuring A* pathfinding, real-time simulation, and perception analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
