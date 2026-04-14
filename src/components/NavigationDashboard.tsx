@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { GridSimulation } from './GridSimulation';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { Navigation, Eye, BarChart3, Settings, Shield, Cpu, Zap } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Navigation, Eye, BarChart3, Shield, Cpu, Zap, Activity, Camera, Map as MapIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 const mockPerformanceData = [
   { name: 'Run 1', steps: 38, time: 0.82 },
@@ -17,6 +17,23 @@ const mockPerformanceData = [
 ];
 
 export const NavigationDashboard: React.FC = () => {
+  const [activeDetections, setActiveDetections] = useState<any[]>([]);
+  const [replanTrigger, setReplanTrigger] = useState(0);
+
+  const handleDetectionEvent = useCallback((obj: string) => {
+    const newDetection = {
+      id: Date.now(),
+      time: new Date().toLocaleTimeString(),
+      obj,
+      conf: (Math.random() * 0.2 + 0.8).toFixed(2),
+      action: obj === 'Person' ? 'STOP' : 'SLOW',
+    };
+    setActiveDetections(prev => [newDetection, ...prev].slice(0, 5));
+    // In a real system, this would map the detection coordinates to grid coordinates
+    // Here we simulate the effect by triggering a re-plan in the GridSimulation
+    setReplanTrigger(prev => prev + 1);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0a0a0c] text-zinc-100 p-4 md:p-8 font-sans selection:bg-sky-500/30">
       <header className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -30,7 +47,7 @@ export const NavigationDashboard: React.FC = () => {
               <Navigation className="text-sky-400" size={24} />
             </div>
             <Badge variant="outline" className="bg-sky-500/5 text-sky-400 border-sky-500/20 px-3 py-0.5 uppercase tracking-widest text-[10px] font-bold">
-              System v1.0.4
+              Autonomous System v2.0
             </Badge>
           </motion.div>
           <motion.h1 
@@ -47,16 +64,23 @@ export const NavigationDashboard: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-zinc-400 max-w-md text-lg"
           >
-            Autonomous navigation system with real-time path planning and perception analysis.
+            Next-gen autonomous navigation with dynamic re-planning and YOLO-integrated perception.
           </motion.p>
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-8">
           <div className="flex flex-col items-end">
             <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Compute Status</span>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
               <span className="text-sm font-mono text-emerald-400">Operational</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-1">Perception Link</span>
+            <div className="flex items-center gap-2">
+              <Activity size={14} className="text-sky-400 animate-pulse" />
+              <span className="text-sm font-mono text-sky-400">Active</span>
             </div>
           </div>
         </div>
@@ -79,17 +103,24 @@ export const NavigationDashboard: React.FC = () => {
           <TabsContent value="navigation" className="mt-0 outline-none">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <Card className="lg:col-span-2 bg-zinc-900/40 border-zinc-800 backdrop-blur-md">
-                <CardHeader>
-                  <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                    <Cpu size={20} className="text-sky-400" />
-                    Real-Time Simulation
-                  </CardTitle>
-                  <CardDescription className="text-zinc-500">
-                    A* Pathfinding algorithm executing on a 25x25 grid environment.
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                      <Cpu size={20} className="text-sky-400" />
+                      Dynamic Grid Simulation
+                    </CardTitle>
+                    <CardDescription className="text-zinc-500">
+                      Real-time A* re-planning with moving obstacles.
+                    </CardDescription>
+                  </div>
+                  {replanTrigger > 0 && (
+                    <Badge variant="outline" className="bg-sky-500/10 text-sky-400 border-sky-500/20 animate-pulse">
+                      External Re-plan Triggered
+                    </Badge>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <GridSimulation />
+                  <GridSimulation onReplan={() => handleDetectionEvent('Obstacle')} />
                 </CardContent>
               </Card>
 
@@ -98,20 +129,26 @@ export const NavigationDashboard: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <Shield size={18} className="text-sky-400" />
-                      System Constraints
+                      System Pipeline
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-4 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
-                      <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Algorithm</div>
-                      <div className="text-sm font-medium">A* (A-Star) Search</div>
-                      <div className="text-xs text-zinc-500 mt-1">Heuristic: Manhattan Distance</div>
-                    </div>
-                    <div className="p-4 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
-                      <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Environment</div>
-                      <div className="text-sm font-medium">2D Grid Map</div>
-                      <div className="text-xs text-zinc-500 mt-1">Density: 22% Obstacles</div>
-                    </div>
+                    {[
+                      { icon: <Camera size={14} />, label: 'Input', status: 'Camera/Video' },
+                      { icon: <Eye size={14} />, label: 'Perception', status: 'YOLOv8 Active' },
+                      { icon: <MapIcon size={14} />, label: 'Mapping', status: 'Obstacle Grid' },
+                      { icon: <Navigation size={14} />, label: 'Planner', status: 'A* Dynamic' },
+                    ].map((step, i) => (
+                      <div key={i} className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 bg-zinc-900 rounded border border-zinc-800 text-zinc-400">
+                            {step.icon}
+                          </div>
+                          <span className="text-xs font-medium text-zinc-300">{step.label}</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-sky-400 uppercase">{step.status}</span>
+                      </div>
+                    ))}
                   </CardContent>
                 </Card>
 
@@ -119,21 +156,25 @@ export const NavigationDashboard: React.FC = () => {
                   <CardHeader>
                     <CardTitle className="text-lg font-semibold flex items-center gap-2">
                       <Zap size={18} className="text-sky-400" />
-                      Quick Actions
+                      Manual Overrides
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-3">
-                    <Button variant="outline" className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6">
-                      Export Path
+                    <Button 
+                      variant="outline" 
+                      className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6 flex flex-col gap-1"
+                      onClick={() => handleDetectionEvent('Person')}
+                    >
+                      <span>Inject Person</span>
+                      <span className="text-[9px] text-zinc-500 uppercase">Trigger STOP</span>
                     </Button>
-                    <Button variant="outline" className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6">
-                      Save Map
-                    </Button>
-                    <Button variant="outline" className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6">
-                      Calibrate
-                    </Button>
-                    <Button variant="outline" className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6">
-                      Logs
+                    <Button 
+                      variant="outline" 
+                      className="bg-zinc-900/50 border-zinc-800 hover:bg-zinc-800 text-xs py-6 flex flex-col gap-1"
+                      onClick={() => handleDetectionEvent('Car')}
+                    >
+                      <span>Inject Car</span>
+                      <span className="text-[9px] text-zinc-500 uppercase">Trigger SLOW</span>
                     </Button>
                   </CardContent>
                 </Card>
@@ -147,36 +188,57 @@ export const NavigationDashboard: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Eye size={20} className="text-sky-400" />
-                    Scene Analysis
+                    Real-Time Perception Feed
                   </CardTitle>
-                  <CardDescription>Real-time threat detection and navigation mapping.</CardDescription>
+                  <CardDescription>YOLOv8 analysis synchronized with navigation grid.</CardDescription>
                 </CardHeader>
-                <CardContent className="p-0 relative aspect-video bg-zinc-950 flex items-center justify-center">
+                <CardContent className="p-0 relative aspect-video bg-zinc-950 flex items-center justify-center group">
                   <img 
                     src="https://images.unsplash.com/photo-1545147986-a9d6f210df77?auto=format&fit=crop&q=80&w=1200" 
                     alt="Street Scene" 
-                    className="w-full h-full object-cover opacity-40"
+                    className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-500"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 p-8 flex flex-col justify-between">
                     <div className="flex justify-between items-start">
-                      <div className="bg-zinc-900/90 border border-zinc-700 p-2 rounded text-[10px] font-mono">
-                        CAM_01 // 1080p // 60FPS
+                      <div className="bg-zinc-900/90 border border-zinc-700 p-2 rounded text-[10px] font-mono flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />
+                        LIVE_FEED // CAM_01 // 1080p
                       </div>
                       <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest">
-                        Live Feed
+                        Perception Active
                       </div>
                     </div>
                     
                     {/* Simulated Bounding Boxes */}
-                    <div className="absolute top-1/4 left-1/3 w-32 h-48 border-2 border-rose-500 rounded-sm">
+                    <motion.div 
+                      animate={{ x: [0, 20, 0], y: [0, 10, 0] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className="absolute top-1/4 left-1/3 w-32 h-48 border-2 border-rose-500 rounded-sm"
+                    >
                       <div className="absolute -top-6 left-0 bg-rose-500 text-white text-[10px] px-1 font-bold">PERSON 0.98</div>
-                      <div className="absolute -bottom-6 left-0 bg-rose-500/20 text-rose-400 text-[10px] px-1 font-bold border border-rose-500/40">ACTION: STOP</div>
-                    </div>
+                      <div className="absolute -bottom-6 left-0 bg-rose-500/20 text-rose-400 text-[10px] px-1 font-bold border border-rose-500/40 backdrop-blur-sm">ACTION: STOP</div>
+                    </motion.div>
                     
-                    <div className="absolute top-1/2 left-1/2 w-48 h-32 border-2 border-sky-500 rounded-sm">
+                    <motion.div 
+                      animate={{ x: [0, -30, 0] }}
+                      transition={{ duration: 6, repeat: Infinity }}
+                      className="absolute top-1/2 left-1/2 w-48 h-32 border-2 border-sky-500 rounded-sm"
+                    >
                       <div className="absolute -top-6 left-0 bg-sky-500 text-white text-[10px] px-1 font-bold">CAR 0.92</div>
-                      <div className="absolute -bottom-6 left-0 bg-sky-500/20 text-sky-400 text-[10px] px-1 font-bold border border-sky-500/40">ACTION: SLOW</div>
+                      <div className="absolute -bottom-6 left-0 bg-sky-500/20 text-sky-400 text-[10px] px-1 font-bold border border-sky-500/40 backdrop-blur-sm">ACTION: SLOW</div>
+                    </motion.div>
+
+                    <div className="bg-zinc-900/80 border border-zinc-800 p-4 rounded-lg backdrop-blur-md max-w-xs">
+                      <div className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold mb-2">Inference Engine</div>
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-zinc-400">Latency</span>
+                        <span className="text-emerald-400 font-mono">12ms</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-zinc-400">Objects</span>
+                        <span className="text-sky-400 font-mono">2 Active</span>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -184,26 +246,36 @@ export const NavigationDashboard: React.FC = () => {
 
               <Card className="bg-zinc-900/40 border-zinc-800">
                 <CardHeader>
-                  <CardTitle className="text-lg">Detection Logs</CardTitle>
+                  <CardTitle className="text-lg">Perception Logs</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {[
-                    { time: '12:04:22', obj: 'Person', conf: '98%', action: 'STOP' },
-                    { time: '12:04:21', obj: 'Car', conf: '92%', action: 'SLOW' },
-                    { time: '12:04:18', obj: 'Traffic Light', conf: '88%', action: 'CHECK' },
-                    { time: '12:04:15', obj: 'Bicycle', conf: '76%', action: 'MONITOR' },
-                  ].map((log, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50">
-                      <div>
-                        <div className="text-[10px] text-zinc-500 font-mono">{log.time}</div>
-                        <div className="text-sm font-medium">{log.obj}</div>
+                  <AnimatePresence initial={false}>
+                    {activeDetections.length === 0 ? (
+                      <div className="text-center py-12 text-zinc-600 text-sm">
+                        No active detections. <br/> Use "Manual Overrides" to test.
                       </div>
-                      <div className="text-right">
-                        <div className="text-[10px] text-sky-400 font-bold">{log.conf}</div>
-                        <Badge variant="outline" className="text-[9px] py-0 h-4 uppercase">{log.action}</Badge>
-                      </div>
-                    </div>
-                  ))}
+                    ) : (
+                      activeDetections.map((log) => (
+                        <motion.div 
+                          key={log.id} 
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg border border-zinc-800/50"
+                        >
+                          <div>
+                            <div className="text-[10px] text-zinc-500 font-mono">{log.time}</div>
+                            <div className="text-sm font-medium">{log.obj}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-[10px] text-sky-400 font-bold">{log.conf}</div>
+                            <Badge variant="outline" className={`text-[9px] py-0 h-4 uppercase ${log.action === 'STOP' ? 'text-rose-400 border-rose-500/20' : 'text-amber-400 border-amber-500/20'}`}>
+                              {log.action}
+                            </Badge>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </AnimatePresence>
                 </CardContent>
               </Card>
             </div>

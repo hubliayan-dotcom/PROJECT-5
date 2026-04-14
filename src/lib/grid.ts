@@ -40,4 +40,12 @@ export class GridEnvironment {
       }
     }
   }
+
+  setObstacle(r: number, c: number, value: number) {
+    if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
+      // Don't place obstacles on start or goal
+      if ((r === this.start[0] && c === this.start[1]) || (r === this.goal[0] && c === this.goal[1])) return;
+      this.grid[r][c] = value;
+    }
+  }
 }

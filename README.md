@@ -9,9 +9,36 @@ AeroNav AI is a production-grade autonomous navigation system. It enables a virt
 
 ### 🎯 Key Highlights
 - **End-to-End Pipeline**: Modular Python architecture (`astar.py`, `grid_env.py`, `yolo_detect.py`, `main_sim.py`).
+- **Dynamic Re-planning**: Real-time obstacle detection and A* path recalculation.
+- **YOLO-Integrated Navigation**: Perception layer detections directly trigger navigation state changes.
 - **Virtual Simulation Proof**: Interactive React-based web dashboard and Pygame-based desktop simulation.
-- **Perception Layer**: Real-time object detection and decision mapping using YOLOv8.
 - **Data-Driven Analytics**: Performance benchmarking with automated graph generation.
+
+---
+
+## 📐 System Architecture
+```mermaid
+graph TD
+    Input[Camera / Video Input] --> YOLO[YOLOv8 Object Detection]
+    YOLO --> Mapping[Obstacle Mapping & Grid Update]
+    Mapping --> AStar[A* Dynamic Path Planning]
+    AStar --> Controller[Navigation Controller]
+    Controller --> Output[Simulation Output / Actuator Commands]
+    
+    subgraph Perception Layer
+        YOLO
+    end
+    
+    subgraph Planning Layer
+        Mapping
+        AStar
+    end
+    
+    subgraph Execution Layer
+        Controller
+        Output
+    end
+```
 
 ---
 
