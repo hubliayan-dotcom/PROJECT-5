@@ -1,7 +1,5 @@
 # AeroNav AI - Autonomous Navigation System
 
-![AeroNav AI Banner](https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=1200)
-
 > **"Can I run this end-to-end?"** — Yes. This project features a fully integrated, modular pipeline for autonomous navigation, perception, and analytics.
 
 ## 🚀 Project Overview
@@ -131,6 +129,4 @@ Integrated YOLOv8 analysis maps detected objects to navigation actions:
 
 ---
 
-## 👤 Author
-**[Your Name]**
-[LinkedIn] | [GitHub] | [Portfolio]
+
